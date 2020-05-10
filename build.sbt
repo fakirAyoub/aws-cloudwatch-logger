@@ -18,6 +18,9 @@ homepage := Some(url("https://github.com/fakirAyoub/aws-cloudwatch-logger"))
 licenses := Seq("Apache 2.0" -> url("http://www.apache.org/licenses/LICENSE-2.0"))
 publishMavenStyle := true
 publishArtifact in Test := false
+
+credentials += Credentials(Path.userHome / ".sbt" / "sonatype_credentials")
+
 pomIncludeRepository := { _ => false }
 publishTo in ThisBuild := {
   val nexus = "https://oss.sonatype.org/"
