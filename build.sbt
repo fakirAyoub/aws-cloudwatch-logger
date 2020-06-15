@@ -3,7 +3,7 @@ name := "aws-cloudwatch-logger"
 
 version := "0.1"
 
-scalaVersion := "2.12.8"
+scalaVersion := "2.11.8"
 
 
 libraryDependencies += "com.amazonaws" % "aws-java-sdk-cloudwatch" % "1.11.604"
