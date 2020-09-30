@@ -5,7 +5,7 @@ import java.util
 import com.amazonaws.auth.{AWSStaticCredentialsProvider, DefaultAWSCredentialsProviderChain}
 import com.amazonaws.services.logs.model._
 import com.amazonaws.services.logs.{AWSLogs, AWSLogsClientBuilder}
-import dev.fakir.cloudwatchlogging.models.CloudWatchLogsProperties
+import dev.fakir.cloudwatchlogging.models.{CloudWatchLogsProperties, Token}
 
 object CloudWatchLogger {
   def getRequestEvent(cloudWatchLogsProperties: CloudWatchLogsProperties)(implicit watch: AWSLogs): PutLogEventsRequest = {
@@ -27,13 +27,11 @@ object CloudWatchLogger {
   }
 
   def getNextToken(logStreams: util.List[LogStream], logStreamName: String): String = {
-    var token = ""
+
     import scala.collection.JavaConversions._
-    for (logStream <- logStreams) {
-      if (logStream.getLogStreamName.equals(logStreamName))
-        token = logStream.getUploadSequenceToken
-    }
-    token
+
+    logStreams.reduceLeft((_, logStream) =>  if (logStream.getLogStreamName.equals(logStreamName)) logStream.getUploadSequenceToken else Token.EMPTY_TOKEN.value)
+
   }
 
   def buildEvent[T](log: Map[String, T]*): InputLogEvent = {
@@ -48,9 +46,9 @@ object CloudWatchLogger {
   }
 
   def awsCloudWatch(region: String): AWSLogs = {
-    val creds = new DefaultAWSCredentialsProviderChain
+    val credentials = new DefaultAWSCredentialsProviderChain
     AWSLogsClientBuilder.standard()
-      .withCredentials(new AWSStaticCredentialsProvider(creds.getCredentials))
+      .withCredentials(new AWSStaticCredentialsProvider(credentials.getCredentials))
       .withRegion(region).build()
   }
 }
