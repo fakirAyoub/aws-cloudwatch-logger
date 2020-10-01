@@ -26,4 +26,17 @@ trait Loggable {
     val infoEvent = buildEvent(msg)
     CloudWatchLogger.writeEvents(Seq(infoEvent), cloudWatchError)
   }
+
+  protected def info(msg: String): Unit = {
+    logger.info(msg)
+    CloudWatchLogger.writeEvent(msg, cloudWatchInfo)
+  }
+  protected def error(msg: String): Unit = {
+    logger.error(msg)
+    CloudWatchLogger.writeEvent(msg, cloudWatchError)
+  }
+
+  protected def info(messages: Seq[String]): Unit = {
+
+  }
 }

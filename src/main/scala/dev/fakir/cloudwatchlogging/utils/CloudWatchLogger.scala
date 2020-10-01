@@ -26,6 +26,12 @@ object CloudWatchLogger {
     watch.putLogEvents(requestToSend)
   }
 
+  def writeEvent(event: String, request: PutLogEventsRequest)(implicit watch: AWSLogs): PutLogEventsResult = {
+    val requestToSend = getRequestEvent(CloudWatchLogsProperties(request.getLogGroupName, request.getLogStreamName))
+    requestToSend.setLogEvents(prepareEvent(event))
+    watch.putLogEvents(requestToSend)
+  }
+
   def getNextToken(logStreams: util.List[LogStream], logStreamName: String): String = {
 
     import scala.collection.JavaConversions._
@@ -37,11 +43,17 @@ object CloudWatchLogger {
   def buildEvent[T](log: Map[String, T]*): InputLogEvent = {
     new InputLogEvent().withMessage(log.mkString(":")).withTimestamp(System.currentTimeMillis)
   }
+
   def appendEvents(events: Seq[InputLogEvent]): util.ArrayList[InputLogEvent] = {
     val logEvents = new util.ArrayList[InputLogEvent]()
-    events.map(event => {
-      logEvents.add(event)
-    })
+    events.map(logEvents.add)
+    logEvents
+  }
+
+  def prepareEvent(event: String): util.ArrayList[InputLogEvent] = {
+    val logEvent = new InputLogEvent().withMessage(event)
+    val logEvents = new util.ArrayList[InputLogEvent]()
+    logEvents.add(logEvent)
     logEvents
   }
 

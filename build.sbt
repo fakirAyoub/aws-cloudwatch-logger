@@ -9,6 +9,7 @@ scalaVersion := "2.11.8"
 libraryDependencies += "com.amazonaws" % "aws-java-sdk-cloudwatch" % "1.11.604"
 libraryDependencies += "com.amazonaws" % "aws-java-sdk-logs" % "1.11.601"
 libraryDependencies += "org.slf4j" % "slf4j-api" % "1.7.14"
+libraryDependencies += "dev.zio" %% "zio" % "1.0.1"
 
 organization in ThisBuild := "dev.fakir"
 
