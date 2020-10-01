@@ -6,6 +6,7 @@ import com.amazonaws.services.logs.AWSLogs
 import com.amazonaws.services.logs.model.{InputLogEvent, PutLogEventsRequest, PutLogEventsResult}
 import dev.fakir.cloudwatchlogging.models.CloudWatchLogsProperties
 import dev.fakir.cloudwatchlogging.utils.CloudWatchEnv.getRequestEvent
+import dev.fakir.cloudwatchlogging.utils.CloudWatchException.InvalidSequenceTokenException
 import zio.{Task, ZIO}
 
 object CloudWatchEvents {
@@ -36,6 +37,9 @@ object CloudWatchEvents {
   def writeEvent(event: String, request: PutLogEventsRequest)(implicit watch: AWSLogs): ZIO[Any, Throwable, PutLogEventsResult] = {
     val requestToSend = getRequestEvent(CloudWatchLogsProperties(request.getLogGroupName, request.getLogStreamName))
     requestToSend.setLogEvents(prepareEvent(event))
-    Task(watch.putLogEvents(requestToSend))
+
+    Task(watch.putLogEvents(requestToSend)).catchSome {
+      case i: InvalidSequenceTokenException => ZIO.fail(InvalidSequenceTokenException(i.message, i.cause))
+    }
   }
 }
